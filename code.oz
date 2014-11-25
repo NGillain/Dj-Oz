@@ -1,8 +1,8 @@
-% Vous ne pouvez pas utiliser le mot-clé 'declare'.
+﻿% Vous ne pouvez pas utiliser le mot-clé 'declare'.
 local Mix Interprete Projet CWD in
    % CWD contient le chemin complet vers le dossier contenant le fichier 'code.oz'
    % modifiez sa valeur pour correspondre à votre système.
-   CWD = {Property.condGet 'testcwd' '/home/layus/ucl/fsab1402/2014-2015/projet_2014/src/'}
+   CWD = {Property.condGet 'testcwd' 'mettre son propre chemin pour le fichier :)'}
 
    % Si vous utilisez Mozart 1.4, remplacez la ligne précédente par celle-ci :
    % [Projet] = {Link ['Projet2014_mozart1.4.ozf']}
@@ -19,6 +19,18 @@ local Mix Interprete Projet CWD in
 
    local
       Audio = {Projet.readFile CWD#'wave/animaux/cow.wav'}
+      fun { ToNote Note }
+         case Note
+	 of Nom# Octave then note (nom :Nom octave : Octave alteration :'#')
+	 [] Atom then
+	    case { AtomToString Atom }
+	    of [N] then note ( nom : Atom octave : 4 alteration : none )
+	    [] [N O] then note (nom :{ StringToAtom [N]}
+	    			octave :{ StringToInt [O]}
+	    			alteration : none )
+	    end
+	 end
+      end
    in
       % Mix prends une musique et doit retourner un vecteur audio.
       fun {Mix Interprete Music}
@@ -27,7 +39,14 @@ local Mix Interprete Projet CWD in
 
       % Interprete doit interpréter une partition
       fun {Interprete Partition}
-         nil
+         case Partition
+	 of H|nil then {NoteToEchantillon {ToNote H}}
+	 [] H|T then {Interprete H}|{Interprete T} % Il manque le cas pour une partition seule
+	 [] muet( X ) then 
+	 [] duree( secondes:X Y ) then
+	 [] etirer( facteur:X Y ) then
+	 [] bourdon( note:X Y ) then
+	 [] transpose( demitons:X Y ) then
       end
    end
 
