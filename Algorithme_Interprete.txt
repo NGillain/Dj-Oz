@@ -1,0 +1,21 @@
+Algorithme de base pour Interprete
+
+Interprete prend en argument un des trois cas ci-dessous et retourne
+dans tous les cas un record echantillon(...)
+
+1. Faire du pattern matching pour séparer les cas où Partition est:
+
+- Une suite de partition
+==>la décomposer en une partition et la traiter dans le pattern matching
+
+- Une partition
+==> ???
+
+- Une Note
+==>appliquer ToNote pour obtenir un note(...) et ensuite appliquer une
+nouvelle fonction {NoteToEchantillon Note} qui retourne un echantillon à
+partir d'une Note
+
+- Une transormation
+==>décomposer la partition en une liste d'echantillon avec les champs
+modifiés en conséquence et l'ajouter 
