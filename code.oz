@@ -31,6 +31,36 @@ local Mix Interprete Projet CWD in
 	    end
 	 end
       end
+      fun{NoteToEchantillon Note}
+      	%ajouter la fonction
+      end
+      fun{ComputeDemiTons Note}
+      	local DiffDemiTons
+      	  Error1
+      	  Error2
+      	  DiffOctave = Note.octave - 4 % 4 est l'octave fondamentale
+      	  NoteString = {AtomToString Note.nom}
+      	  Ref = {AtomToString 'a'}
+      	  DiffNote = 2*(NoteString - Ref)
+      	in
+      	  if NoteString>98 then Error1 = 1
+      	  elseif NoteString>101 then Error2 = 2
+      	  else Error1=0
+      	  end
+      	  if Note.alteration=='#' then Error2=1
+      	  else Error2=0
+      	  end
+      	12*DiffOctave+DiffNote+Erroe1+Error2
+      	end
+      end
+      % Flatten réduit les listes de listes de ... en liste simple
+      fun{Flatten L}
+        case L
+	of nil then nil
+	[] H|T then {Append {FlattenList H} {FlattenList T}}
+	else [L]
+        end
+      end
    in
       % Mix prends une musique et doit retourner un vecteur audio.
       fun {Mix Interprete Music}
