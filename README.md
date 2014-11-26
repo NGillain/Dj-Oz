@@ -18,3 +18,5 @@ Séance de 24 novembre :
 Pour le Jeudi 27 novembre :
 
 -Tâche 3 : Implémenter Interpreter(au moins le premier et le deuxième cas : pour une note et une suite de partition)
+
+-Tâche 4 : Créer les fonctions supplémentaires nécessaire à l'implémentation (voir issues)
