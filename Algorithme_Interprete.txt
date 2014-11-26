@@ -9,7 +9,9 @@ dans tous les cas un record echantillon(...)
 ==>la décomposer en une partition et la traiter dans le pattern matching
 
 - Une partition
-==> ???
+==> Pour chaque éléments dans la partition(transformation, note ou somme
+de partition), utiliser flatten et traiter chaque Atom ou record avec le
+pattern matching
 
 - Une Note
 ==>appliquer ToNote pour obtenir un note(...) et ensuite appliquer une
@@ -18,4 +20,12 @@ partir d'une Note
 
 - Une transormation
 ==>décomposer la partition en une liste d'echantillon avec les champs
-modifiés en conséquence et l'ajouter 
+modifiés en conséquence.
+
+Les fonctions suivantes doivent être implémentées correctement pour
+que le pattern matching fonctionne:
+
+- NoteToEchantillon : transforme une Note en record echantillon()
+
+- Flatten : réduit une liste de liste de ... en une liste simple d'Atom
+et de records.
