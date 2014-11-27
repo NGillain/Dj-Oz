@@ -75,7 +75,7 @@ local Mix Interprete Projet CWD in
       fun{Duree X Y}
 	local time coef in
 	  time={DureePart Y 0}
-	  coef={IntToFloat X} / {IntToFloat time} % quid de la conversion???
+	  coef= X / time
       	  case Y of nil then nil
 	  []H|T then {Etirer coef Y}
 	  end
