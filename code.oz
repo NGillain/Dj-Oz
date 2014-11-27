@@ -69,23 +69,39 @@ local Mix Interprete Projet CWD in
       end
       
       fun{Muet X}
-      %code
+        {Bourdon silence X}
       end
       
       fun{Duree X Y}
-      %code
+	local time coef in
+	  time={DureePart Y 0}
+	  coef={IntToFloat X} / {IntToFloat time} % quid de la conversion???
+      	  case Y of nil then nil
+	  []H|T then {Etirer coef Y}
+	  end
+	end
       end
       
       fun{Etirer X Y}
-      %code
+        case Y of nil then nil
+	[]H|T then echantillon(hauteur:H.hauteur duree:(H.duree)*X alteration:H.instrument)
+	end
       end
       
       fun{Bourdon X Y}
-      %code
+        case Y of nil then nil
+	[]H|T then echantillon(hauteur:{ComputeDemiTons X} duree:H.duree instrument:H.instrument)|{Bourdon X T}
       end
       
       fun{Transpose X Y}
-      %code
+      	case Y of nil then nil
+	[]H|T then echantillon(hauteur:H.hauteur+X duree:H.duree instrument:H.instrument)|{Transpose X T}
+      end
+
+      fun{DureePart X Acc}
+	case X of nil then Acc
+	[]H|T then {DureePart T Acc+H.duree}
+	end
       end
    in
       % Mix prends une musique et doit retourner un vecteur audio.
@@ -98,11 +114,11 @@ local Mix Interprete Projet CWD in
          case Partition
 	 of [Atom] then {NoteToEchantillon {ToNote Atom}}
 	 [] H|T then {Interprete H}|{Interprete T} % Il manque le cas pour une partition seule
-	 [] muet( X ) then {Muet X}
-	 [] duree( secondes:X Y ) then {Duree X Y}
-	 [] etirer( facteur:X Y ) then {Etirer X Y}
-	 [] bourdon( note:X Y ) then {Bourdon X Y}
-	 [] transpose( demitons:X Y ) then {Transpose X Y}
+	 [] muet( X ) then {Muet {Interprete{Flatten X}}}
+	 [] duree( secondes:X Y ) then {Duree X {Interprete{Flatten Y}}}
+	 [] etirer( facteur:X Y ) then {Etirer X {Interprete{Flatten Y}}}
+	 [] bourdon( note:X Y ) then {Bourdon X {Interprete{Flatten Y}}}
+	 [] transpose( demitons:X Y ) then {Transpose X {Interprete{Flatten Y}}}
       end
    end
 
