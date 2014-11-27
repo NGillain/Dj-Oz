@@ -32,7 +32,7 @@ local Mix Interprete Projet CWD in
 	 end
       end
       fun{NoteToEchantillon Note}
-      	%ajouter la fonction
+      	echantillon(hauteur:{ComputeDemiTons Note} duree : 1 instrument : none)
       end
       fun{ComputeDemiTons Note}
       	local DiffDemiTons
