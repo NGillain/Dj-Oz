@@ -28,20 +28,25 @@ local Mix Interprete Projet CWD in
 	    [] [N O] then note (nom :{ StringToAtom [N]}
 	    			octave :{ StringToInt [O]}
 	    			alteration : none )
+	    else silence
 	    end
 	 end
       end
+      
       fun{NoteToEchantillon Note}
-      	echantillon(hauteur:{ComputeDemiTons Note} duree : 1 instrument : none)
+      	case Note
+      	of Atom then silence(duree:1)
+      	[] note(nom:X octave:Y alteration:Z) then echantillon(hauteur:{ComputeDemiTons Note} duree:1 instrument:none)
       end
+      
       fun{ComputeDemiTons Note}
-      	local DiffDemiTons
+      	local
       	  Error1
       	  Error2
-      	  DiffOctave = Note.octave - 4 % 4 est l'octave fondamentale
+      	  DiffOctave = Note.octave - 4   % 4 est l'octave fondamentale
       	  NoteString = {AtomToString Note.nom}
       	  Ref = {AtomToString 'a'}
-      	  DiffNote = 2*(NoteString - Ref)
+      	  DiffNote = 2*(NoteString - Ref)   % supposons deux demi-tons entre chaque note
       	in
       	  if NoteString>98 then Error1 = 1
       	  elseif NoteString>101 then Error2 = 2
@@ -53,6 +58,7 @@ local Mix Interprete Projet CWD in
       	12*DiffOctave+DiffNote+Erroe1+Error2
       	end
       end
+      
       % Flatten réduit les listes de listes de ... en liste simple
       fun{Flatten L}
         case L
@@ -60,6 +66,26 @@ local Mix Interprete Projet CWD in
 	[] H|T then {Append {FlattenList H} {FlattenList T}}
 	else [L]
         end
+      end
+      
+      fun{Muet X}
+      %code
+      end
+      
+      fun{Duree X Y}
+      %code
+      end
+      
+      fun{Etirer X Y}
+      %code
+      end
+      
+      fun{Bourdon X Y}
+      %code
+      end
+      
+      fun{Transpose X Y}
+      %code
       end
    in
       % Mix prends une musique et doit retourner un vecteur audio.
@@ -70,13 +96,13 @@ local Mix Interprete Projet CWD in
       % Interprete doit interpréter une partition
       fun {Interprete Partition}
          case Partition
-	 of H|nil then {NoteToEchantillon {ToNote H}}
+	 of [Atom] then {NoteToEchantillon {ToNote Atom}}
 	 [] H|T then {Interprete H}|{Interprete T} % Il manque le cas pour une partition seule
-	 [] muet( X ) then 
-	 [] duree( secondes:X Y ) then
-	 [] etirer( facteur:X Y ) then
-	 [] bourdon( note:X Y ) then
-	 [] transpose( demitons:X Y ) then
+	 [] muet( X ) then {Muet X}
+	 [] duree( secondes:X Y ) then {Duree X Y}
+	 [] etirer( facteur:X Y ) then {Etirer X Y}
+	 [] bourdon( note:X Y ) then {Bourdon X Y}
+	 [] transpose( demitons:X Y ) then {Transpose X Y}
       end
    end
 
