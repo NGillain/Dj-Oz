@@ -63,7 +63,7 @@ local Mix Interprete Projet CWD in
       fun{Flatten L}
         case L
 	of nil then nil
-	[] H|T then {Append {FlattenList H} {FlattenList T}}
+	[] H|T then {Append {Flatten H} {Flatten T}}
 	else [L]
         end
       end
