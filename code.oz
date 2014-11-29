@@ -19,9 +19,35 @@ local Mix Interprete Projet CWD in
 
    local
       Audio = {Projet.readFile CWD#'wave/animaux/cow.wav'}
+      
+      % Flatten réduit les listes de listes de ... en liste simple
+      fun{Flatten L}
+        case L
+	of nil then nil
+	[] H|T then {Append {Flatten H} {Flatten T}}
+	else [L]
+        end
+      end
+      
+      fun{ComputeDemiTons Note}
+      	local Diff
+        in
+           case Note.nom of a then Diff=0
+           [] b then Diff=2
+           [] c then Diff=~9
+           [] d then Diff=~7
+           [] e then Diff=~5
+           [] f then Diff=~4
+           [] g then Diff=~2
+           end
+           (Note.octave-4)*12+Diff
+        end
+      end
+      	
+      
       fun { ToNote Note }
          case Note
-	 of Nom# Octave then note (nom :Nom octave : Octave alteration :'#')
+	 of Nom#Octave then note (nom:Nom octave:Octave alteration :'#')
 	 [] Atom then
 	    case { AtomToString Atom }
 	    of [N] then note ( nom : Atom octave : 4 alteration : none )
@@ -31,78 +57,58 @@ local Mix Interprete Projet CWD in
 	    else silence
 	    end
 	 end
-      end
+       end
       
       fun{NoteToEchantillon Note}
       	case Note
-      	of Atom then silence(duree:1)
-      	[] note(nom:X octave:Y alteration:Z) then echantillon(hauteur:{ComputeDemiTons Note} duree:1 instrument:none)
-      end
-      
-      fun{ComputeDemiTons Note}
-      	local
-      	  Error1
-      	  Error2
-      	  DiffOctave = Note.octave - 4   % 4 est l'octave fondamentale
-      	  NoteString = {AtomToString Note.nom}
-      	  Ref = {AtomToString 'a'}
-      	  DiffNote = 2*(NoteString - Ref)   % supposons deux demi-tons entre chaque note
-      	in
-      	  if NoteString>98 then Error1 = 1
-      	  elseif NoteString>101 then Error2 = 2
-      	  else Error1=0
-      	  end
-      	  if Note.alteration=='#' then Error2=1
-      	  else Error2=0
-      	  end
-      	12*DiffOctave+DiffNote+Erroe1+Error2
-      	end
-      end
-      
-      % Flatten réduit les listes de listes de ... en liste simple
-      fun{Flatten L}
-        case L
-	of nil then nil
-	[] H|T then {Append {FlattenList H} {FlattenList T}}
-	else [L]
+      	of silence then silence(duree:1.0)
+      	[] note(nom:X octave:Y alteration:Z) then echantillon(hauteur:{ComputeDemiTons Note} duree:1.0 instrument:none)
         end
+      end
+      
+      fun{Bourdon X Y}
+        case Y of nil then nil
+	[]H|T then 
+	     case X of silence then silence(duree:H.duree)|{Bourdon X T}
+	     [] note(nom:N octave:Octave alteration:A) then echantillon(hauteur:{ComputeDemiTons X} duree:H.duree instrument:H.instrument)|{Bourdon X T}
+	     end
+	end
       end
       
       fun{Muet X}
         {Bourdon silence X}
       end
       
-      fun{Duree X Y}
-	local time coef in
-	  time={DureePart Y 0}
-	  coef= X / time
-      	  case Y of nil then nil
-	  []H|T then {Etirer coef Y}
-	  end
-	end
-      end
-      
       fun{Etirer X Y}
-        case Y of nil then nil
-	[]H|T then echantillon(hauteur:H.hauteur duree:(H.duree)*X alteration:H.instrument)
-	end
-      end
-      
-      fun{Bourdon X Y}
-        case Y of nil then nil
-	[]H|T then echantillon(hauteur:{ComputeDemiTons X} duree:H.duree instrument:H.instrument)|{Bourdon X T}
-      end
-      
-      fun{Transpose X Y}
       	case Y of nil then nil
-	[]H|T then echantillon(hauteur:H.hauteur+X duree:H.duree instrument:H.instrument)|{Transpose X T}
+      	[]H|T then
+            case H of silence(duree:D) then silence(duree:D*X)|{Etirer X T}
+            []echantillon(hauteur:Z duree:Y instrument:I) then echantillon(hauteur:Z duree:Y*X instrument:I)|{Etirer X T}
+            end
+        end
       end
-
+      
       fun{DureePart X Acc}
 	case X of nil then Acc
 	[]H|T then {DureePart T Acc+H.duree}
 	end
       end
+      
+      fun{Duree X Y}
+      	case Y of nil then nil
+      	[]H|T then {Etirer X/{DureePart Y 0.0} Y}
+      	end
+      end
+      
+      fun{Transpose X Y}
+      	case Y of nil then nil
+      	[]H|T then
+      	    case H of silence(duree:D) then silence(duree:D)|{Transpose X T}
+      	    []echantillon(hauteur:H duree:Y instrument:I) then echantillon(hauteur:H+X duree:Y instrument:I)|{Transpose X T}
+            end
+        end
+      end
+   
    in
       % Mix prends une musique et doit retourner un vecteur audio.
       fun {Mix Interprete Music}
@@ -111,16 +117,17 @@ local Mix Interprete Projet CWD in
 
       % Interprete doit interpréter une partition
       fun {Interprete Partition}
-         case Partition
-	 of [Atom] then {NoteToEchantillon {ToNote Atom}}
-	 [] H|T then {Interprete H}|{Interprete T} % Il manque le cas pour une partition seule
-	 [] muet( X ) then {Muet {Interprete{Flatten X}}}
-	 [] duree( secondes:X Y ) then {Duree X {Interprete{Flatten Y}}}
-	 [] etirer( facteur:X Y ) then {Etirer X {Interprete{Flatten Y}}}
-	 [] bourdon( note:X Y ) then {Bourdon X {Interprete{Flatten Y}}}
-	 [] transpose( demitons:X Y ) then {Transpose X {Interprete{Flatten Y}}}
-      end
-   end
+      	case Partition of nil then nil
+      	[]H|T then
+            case H of muet(X) then {Muet {Interprete {Flatten X}}}|{Interprete T}
+            [] duree(secondes:X Y) then {Duree X {Interprete {Flatten Y}}}|{Interprete T}
+            [] etirer(facteur:X Y) then {Etirer X {Interprete {Flatten Y}}}|{Interprete T}
+            [] bourdon(note:X Y) then {Bourdon {ToNote X} {Interprete {Flatten Y}}}|{Interprete T}
+            [] transpose( demitons:X Y ) then {Transpose X {Interprete {Flatten Y}}}|{Interprete T}
+            []A then {NoteToEchantillon {ToNote A}}|{Interprete T}
+            end
+        end
+      end  %manque le flatten du tout début
 
    local 
       Music = {Projet.load CWD#'joie.dj.oz'}
