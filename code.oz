@@ -30,24 +30,20 @@ local Mix Interprete Projet CWD in
       end
       
       fun{ComputeDemiTons Note}
-      	local
-      	  Error1
-      	  Error2
-      	  DiffOctave = Note.octave - 4   % 4 est l'octave fondamentale
-      	  NoteString = {AtomToString Note.nom}
-      	  Ref = {AtomToString 'a'}
-      	  DiffNote = 2*(NoteString - Ref)   % supposons deux demi-tons entre chaque note
-      	in
-      	  if NoteString>98 then Error1 = 1
-      	  elseif NoteString>101 then Error2 = 2
-      	  else Error1=0
-      	  end
-      	  if Note.alteration=='#' then Error2=1
-      	  else Error2=0
-      	  end
-      	12*DiffOctave+DiffNote+Erroe1+Error2
-      	end
-      end  %ne fonctionne pas j'y travaille
+      	local Diff
+        in
+           case Note.nom of a then Diff=0
+           [] b then Diff=2
+           [] c then Diff=~9
+           [] d then Diff=~7
+           [] e then Diff=~5
+           [] f then Diff=~4
+           [] g then Diff=~2
+           end
+           (Note.octave-4)*12+Diff
+        end
+      end
+      	
       
       fun { ToNote Note }
          case Note
@@ -74,7 +70,7 @@ local Mix Interprete Projet CWD in
         case Y of nil then nil
 	[]H|T then 
 	     case X of silence then silence(duree:H.duree)|{Bourdon X T}
-	     [] note(nom:N octave:Octave alteration:A then echantillon(hauteur:{ComputeDemiTons X} duree:H.duree instrument:H.instrument)|{Bourdon X T}
+	     [] note(nom:N octave:Octave alteration:A) then echantillon(hauteur:{ComputeDemiTons X} duree:H.duree instrument:H.instrument)|{Bourdon X T}
 	     end
 	end
       end
