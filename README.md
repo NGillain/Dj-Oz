@@ -27,7 +27,16 @@ Séance du Jeudi 27 novembre :
  
 - Tâche 4 : Créer les fonctions supplémentaires nécessaire à l'implémentation (Done)
 
-- Tâche 5 : Finir l'implémentation de Interprete(Done)
+- Tâche 5 : Finir l'implémentation de Interprete(Enhancement)
+
+- Tâche 6 : Test de Interprete(To Do)
 
 - Tâche 7 : Comprendre la second partie : fonction Mix(To Do)
 
+Pour le Dimanche 30 novembre :
+
+- Tâche 6 : Test de Interprete(Done)
+
+- Tâche 5 : Finir l'implémentation de Interprete(Done)
+
+- Tâche 7 : Comprendre la second partie : fonction Mix
