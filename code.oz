@@ -45,7 +45,7 @@ local Mix Interprete Projet CWD in
       end
       	
       
-      fun { ToNote Note }
+      fun {ToNote Note}
          case Note
 	 of Nom#Octave then note (nom:Nom octave:Octave alteration :'#')
 	 [] Atom then
@@ -112,19 +112,45 @@ local Mix Interprete Projet CWD in
    in
       % Mix prends une musique et doit retourner un vecteur audio.
       fun {Mix Interprete Music}
-         Audio
+	 case Music
+	 of nil then nil
+	 []H|T then
+	    case H
+	    of voix(X) then {Flatten {VoiceToVector X}|{Mix Interprete T}}
+	    []partition(P) then {Flatten {VoiceToVector {Interprete P}}|{Mix Interprete T}}
+	    []wave(S) then {Flatten {Projet.readFile S}|{Mix Intreprete T}}
+	    []merge(L) then {Flatten {MergeToVector L}|{Mix Interprete T}}
+	    else {Flatten {Dispatcher H}|{Mix Interprete T}}
+         %Audio
+	    end
+	 end
+      end
+
+      fun{Dispatcher X}% fonction qui choisit le filtre adapte
+	 case X
+	 of renverser(M) then
+	 [] repetition (nombre:N M) then
+	 [] repetition(duree:S M) then
+	 [] clip(bas:F1 haut:F2 M) then
+	 [] echo(delai:S M) then
+	 [] echo(delai:S decadence:F M) then
+	 [] echo(delai:S decadence:F repetition:N M) then
+	 [] fondu(ouverture:S1 fermeture:S2 M) then
+	 [] fondu_enchaine(duree:S M1 M2) then
+	 [] couper(debut:S1 fin:S2 M) then
+	 end
       end
 
       % Interprete doit interpréter une partition
       fun {Interprete Partition}
       	case Partition of nil then nil
       	[]H|T then
-            case H of muet(X) then {Muet {Interprete {Flatten X}}}|{Interprete T}
-            [] duree(secondes:X Y) then {Duree X {Interprete {Flatten Y}}}|{Interprete T}
-            [] etirer(facteur:X Y) then {Etirer X {Interprete {Flatten Y}}}|{Interprete T}
-            [] bourdon(note:X Y) then {Bourdon {ToNote X} {Interprete {Flatten Y}}}|{Interprete T}
-            [] transpose( demitons:X Y ) then {Transpose X {Interprete {Flatten Y}}}|{Interprete T}
-            []A then {NoteToEchantillon {ToNote A}}|{Interprete T}
+            case H of muet(X) then {Flatten {Muet {Interprete {Flatten X}}}|{Interprete T}}
+            []duree(secondes:X Y) then {Flatten {Duree X {Interprete {Flatten Y}}}|{Interprete T}}
+            []etirer(facteur:X Y) then {Flatten {Etirer X {Interprete {Flatten Y}}}|{Interprete T}}
+            []bourdon(note:X Y) then {Flatten {Bourdon {ToNote X} {Interprete {Flatten Y}}}|{Interprete T}}
+            []transpose( demitons:X Y ) then {Flatten {Transpose X {Interprete {Flatten Y}}}|{Interprete T}}
+            []A then {Flatten {NoteToEchantillon {ToNote A}}|{Interprete T}}
             end
         end
       end  %manque le flatten du tout début
