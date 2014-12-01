@@ -30,17 +30,20 @@ local Mix Interprete Projet CWD in
       end
       
       fun{ComputeDemiTons Note}
-      	local Diff
+      	local Diff Alt
         in
-           case Note.nom of a then Diff=0
-           [] b then Diff=2
-           [] c then Diff=~9
-           [] d then Diff=~7
-           [] e then Diff=~5
-           [] f then Diff=~4
-           [] g then Diff=~2
-           end
-           (Note.octave-4)*12+Diff
+          case Note.nom of a then Diff=0
+          [] b then Diff=2
+          [] c then Diff=~9
+          [] d then Diff=~7
+          [] e then Diff=~5
+          [] f then Diff=~4
+          [] g then Diff=~2
+          end
+	  if Note.alteration=='#' then Alt=1
+	  else Alt=0
+	  end
+          (Note.octave-4)*12+Diff+Alt
         end
       end
       	
@@ -49,11 +52,11 @@ local Mix Interprete Projet CWD in
          case Note
 	 of Nom#Octave then note (nom:Nom octave:Octave alteration :'#')
 	 [] Atom then
-	    case { AtomToString Atom }
-	    of [N] then note ( nom : Atom octave : 4 alteration : none )
-	    [] [N O] then note (nom :{ StringToAtom [N]}
-	    			octave :{ StringToInt [O]}
-	    			alteration : none )
+	    case {AtomToString Atom}
+	    of [N] then note (nom : Atom octave : 4 alteration : none)
+	    [] [N O] then note (nom:{StringToAtom [N]}
+	    			octave:{StringToInt [O]}
+	    			alteration:none)
 	    else silence
 	    end
 	 end
@@ -108,6 +111,55 @@ local Mix Interprete Projet CWD in
             end
         end
       end
+
+      fun{ToVector X} % Transforme un echatillon en vecteur
+	local Comp Acc Aux Pi=3.141592 F=({Pow 2 X.hauteur/12.0}*440.0) in
+	  fun{Aux X Acc Comp}
+	    if Comp==(44100.0*X.duree) then Acc
+	    else
+	      {Aux X Acc|(0.5*{Sin ((2.0*Pi*F*Comp)/44100.0)}) Comp+1}
+	    end
+	  end
+	{Aux X nil 0}
+	end
+      end
+
+      fun{ListEchantillonToVector L} % transforme une liste d'echantillon en vecteur audio
+	case L
+	of H|T then
+	  {Flatten {ToVector H}|{ListEchantillonToVector T}}
+	end
+      end
+
+      fun{MergeToVector X}
+	case X
+	of H|T then
+	  case H
+	  of N#M then {Flatten {Ponderate N {Mix Interprete M}}|}
+	end
+      end
+
+      fun{Ponderate N M} % pondere un vecteur audio avec N
+	case M
+	of H|T then
+	  N*H|{Ponderate N T}
+	end
+      end
+
+      fun{Dispatcher X} % fonction qui choisit le filtre adapte
+	 case X
+	 of renverser(M) then
+	 [] repetition (nombre:N M) then
+	 [] repetition(duree:S M) then
+	 [] clip(bas:F1 haut:F2 M) then
+	 [] echo(delai:S M) then
+	 [] echo(delai:S decadence:F M) then
+	 [] echo(delai:S decadence:F repetition:N M) then
+	 [] fondu(ouverture:S1 fermeture:S2 M) then
+	 [] fondu_enchaine(duree:S M1 M2) then
+	 [] couper(debut:S1 fin:S2 M) then
+	 end
+      end
    
    in
       % Mix prends une musique et doit retourner un vecteur audio.
@@ -126,34 +178,21 @@ local Mix Interprete Projet CWD in
 	 end
       end
 
-      fun{Dispatcher X}% fonction qui choisit le filtre adapte
-	 case X
-	 of renverser(M) then
-	 [] repetition (nombre:N M) then
-	 [] repetition(duree:S M) then
-	 [] clip(bas:F1 haut:F2 M) then
-	 [] echo(delai:S M) then
-	 [] echo(delai:S decadence:F M) then
-	 [] echo(delai:S decadence:F repetition:N M) then
-	 [] fondu(ouverture:S1 fermeture:S2 M) then
-	 [] fondu_enchaine(duree:S M1 M2) then
-	 [] couper(debut:S1 fin:S2 M) then
-	 end
-      end
-
       % Interprete doit interpréter une partition
       fun {Interprete Partition}
-      	case Partition of nil then nil
-      	[]H|T then
+	local P={Flatten Partition} in
+      	  case P of nil then nil
+      	  []H|T then
             case H of muet(X) then {Flatten {Muet {Interprete {Flatten X}}}|{Interprete T}}
             []duree(secondes:X Y) then {Flatten {Duree X {Interprete {Flatten Y}}}|{Interprete T}}
             []etirer(facteur:X Y) then {Flatten {Etirer X {Interprete {Flatten Y}}}|{Interprete T}}
             []bourdon(note:X Y) then {Flatten {Bourdon {ToNote X} {Interprete {Flatten Y}}}|{Interprete T}}
-            []transpose( demitons:X Y ) then {Flatten {Transpose X {Interprete {Flatten Y}}}|{Interprete T}}
+            []transpose(demitons:X Y) then {Flatten {Transpose X {Interprete {Flatten Y}}}|{Interprete T}}
             []A then {Flatten {NoteToEchantillon {ToNote A}}|{Interprete T}}
             end
+	  end
         end
-      end  %manque le flatten du tout début
+      end
 
    local 
       Music = {Projet.load CWD#'joie.dj.oz'}
