@@ -112,22 +112,32 @@ local Mix Interprete Projet CWD in
         end
       end
 
-      fun{ToVector X} % Transforme un echatillon en vecteur
-	local Comp Acc Aux Pi=3.141592 F=({Pow 2 X.hauteur/12.0}*440.0) in
-	  fun{Aux X Acc Comp}
-	    if Comp==(44100.0*X.duree) then Acc
+      fun{ToVector Ech} % Transforme un echatillon en vecteur (ok)
+	local
+	  Long=44100.0*Ech.duree
+	  Pi=3.141592
+	  F
+	  case Ech
+	  of silence(duree:X) then F = 0
+	  [] echantillon(hauteur:X duree:Y alteration:Z)
+	    F=({Pow 2.0 X.hauteur/12.0}*440.0)
+	  end
+	  fun{Vector Acc}
+	    if Acc=<Long then 0.5*{Sin ((2.0*Pi*F*Acc)/44100.0)}|{Vector Acc+1.0}
 	    else
-	      {Aux X Acc|(0.5*{Sin ((2.0*Pi*F*Comp)/44100.0)}) Comp+1}
+	      nil
 	    end
 	  end
-	{Aux X nil 0}
+	in
+	  {Vector 1.0}
 	end
       end
 
-      fun{ListEchantillonToVector L} % transforme une liste d'echantillon en vecteur audio
+      fun{VoiceToVector L} % transforme une liste d'echantillon en vecteur audio
 	case L
-	of H|T then
-	  {Flatten {ToVector H}|{ListEchantillonToVector T}}
+	of nil then nil
+	[] H|T then
+	  {Flatten {ToVector H}|{VoiceToVector T}}
 	end
       end
 
