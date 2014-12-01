@@ -1,11 +1,15 @@
 Algorithme de la fonction Mix:
 
-- prendre chaque cas de "musique" ‡ traiter et la transformer en
+
+Prendre chaque cas de "musique" √† traiter et la transformer en
 vecteur audio
 
-- partition et echantillon : Èvaluer chaque seconde de notes en 44100
-valeurs.
+- partition et echantillon : √©valuer chaque seconde de notes en 44100
+valeurs
 
--fichier .wav : mÈthode donnÈe mais il reste qqch ‡ implÈmenter apparemment
+- fichier .wav : m√©thode donn√©e √† utiliser
 
-- filtre : ‡ voir
+- filtre : appeler un fonction pour chaque filtre
+
+- merge : sommer les intensit√© calcul√©es pour chaque vecter audio de musique multipli√© par son coefficient et
+le mettre dans un vecteur de la m√™me taille que le plus long des vecteurs audio de base.
