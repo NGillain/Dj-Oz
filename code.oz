@@ -119,8 +119,7 @@ local Mix Interprete Projet CWD in
 	  F
 	  case Ech
 	  of silence(duree:X) then F = 0
-	  [] echantillon(hauteur:X duree:Y alteration:Z)
-	    F=({Pow 2.0 X.hauteur/12.0}*440.0)
+	  [] echantillon(hauteur:X duree:Y alteration:Z) then F=({Pow 2.0 X.hauteur/12.0}*440.0)
 	  end
 	  fun{Vector Acc}
 	    if Acc=<Long then 0.5*{Sin ((2.0*Pi*F*Acc)/44100.0)}|{Vector Acc+1.0}
@@ -178,17 +177,55 @@ local Mix Interprete Projet CWD in
 
       fun{Dispatcher X} % fonction qui choisit le filtre adapte
 	 case X
-	 of renverser(M) then
+	 of renverser(M) then {Renverser {Mix Interprete M}}
 	 [] repetition (nombre:N M) then
 	 [] repetition(duree:S M) then
-	 [] clip(bas:F1 haut:F2 M) then
+	 [] clip(bas:F1 haut:F2 M) then {Clip F1 F2 {Mix Interprete M}}
 	 [] echo(delai:S M) then
 	 [] echo(delai:S decadence:F M) then
 	 [] echo(delai:S decadence:F repetition:N M) then
 	 [] fondu(ouverture:S1 fermeture:S2 M) then
 	 [] fondu_enchaine(duree:S M1 M2) then
-	 [] couper(debut:S1 fin:S2 M) then
+	 [] couper(debut:S1 fin:S2 M) then {Couper S1 S2 {Mix Interprete M}}
 	 end
+      end
+
+      fun{Renverser M}
+	case M of nil then nil
+	else
+	  local Aux in
+	    fun{Aux M Acc}
+	      case M of nil then Acc.2
+	      of H|T then
+		{Aux T Acc|H}
+	      end
+	    end
+	  {Aux T nil}
+	  end
+	end
+      end
+
+      fun{Clip F1 F2 M}
+	case M of nil then nil
+	[] H|T then
+	  if H>F1 anthen H<F2 then H|{Clip F1 F2 T}
+	  elseif H<F1 then F1|{Clip F1 F2 T}
+	  elseif H>F2 then F2|{Clip F1 F2 T}
+	  end
+	end
+      end
+
+      fun{Couper S1 S2 M} % fonctionne que pour l'intervalle dans le morceau
+	local Aux Acc Comp in
+	  fun{Aux S1 S2 M Comp Acc}
+	    if M==nil then Acc.2
+	    elseif Comp<S1*44100.0 then {Aux S1 S2 M.2 Comp+1.0 Acc}
+	    elseif Comp>=S1*44100.0 andthen Comp<=S2*44100.0 then {Aux S1 S2 M.2 Comp+1.0 Acc|M.1}
+	    elseif Comp>S2 then {Aux S1 S2 nil Comp Acc}
+	    end
+	  end
+	{Aux S1 S2 M 1 nil}
+	end
       end
    
    in
