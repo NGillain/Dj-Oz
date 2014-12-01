@@ -217,15 +217,15 @@ local Mix Interprete Projet CWD in
       end
 
       fun{Couper S1 S2 M} % fonctionne que pour l'intervalle dans le morceau
-	local Aux Acc Comp in
-	  fun{Aux S1 S2 M Comp Acc}
-	    if M==nil then Acc.2
-	    elseif Comp<S1*44100.0 then {Aux S1 S2 M.2 Comp+1.0 Acc}
-	    elseif Comp>=S1*44100.0 andthen Comp<=S2*44100.0 then {Aux S1 S2 M.2 Comp+1.0 Acc|M.1}
-	    elseif Comp>S2 then {Aux S1 S2 nil Comp Acc}
+	local Aux Comp in
+	  fun{Aux S1 S2 M Comp}
+	    if M==nil then nil
+	    elseif Comp<S1*44100.0 then {Aux S1 S2 M.2 Comp+1.0}
+	    elseif Comp>=S1*44100.0 andthen Comp<=S2*44100.0 then M.1|{Aux S1 S2 M.2 Comp+1.0}
+	    elseif Comp>S2 then {Aux S1 S2 nil Comp}
 	    end
 	  end
-	{Aux S1 S2 M 1 nil}
+	{Aux S1 S2 M 1}
 	end
       end
    
