@@ -141,12 +141,32 @@ local Mix Interprete Projet CWD in
 	end
       end
 
-      fun{MergeToVector X}
+      fun{ListVector X} % cree une liste contenant des listes representant les vecteurs audio a sommer
 	case X
 	of H|T then
 	  case H
-	  of N#M then {Flatten {Ponderate N {Mix Interprete M}}|}
+	  of N#M then {Ponderate N {Mix Interprete M}}|{ListVector T}
 	end
+      end
+
+      fun{Add P2 P1} % add a list of vector(P2) to one vector(P1) and return the sum
+	case P2 of nil then P1
+	[] H|T then {Add T {AddVector P1 H {List.make {Max P1 H}}}}
+      end
+
+      fun{AddVector V1 V2 Acc}
+	if V1\=nil andthen V2\=nil then {AddVector V1.2 V2.2 Acc|V1.1+V2.1}
+	elseif V1==nil then {Addvector nil V2.2 Acc|V2.1}
+	elseif V2==nil then {AddVector V1.2 nil Acc|V1.1}
+	else Acc
+      end
+
+      fun{MergeToVector X} % merge les vecteurs
+	local
+	  P={ListVector X}
+	  Sum
+	in
+	  Sum={Add P.2 P.1} % gere l'addition de listes de taille differente
       end
 
       fun{Ponderate N M} % pondere un vecteur audio avec N
@@ -183,7 +203,6 @@ local Mix Interprete Projet CWD in
 	    []wave(S) then {Flatten {Projet.readFile S}|{Mix Intreprete T}}
 	    []merge(L) then {Flatten {MergeToVector L}|{Mix Interprete T}}
 	    else {Flatten {Dispatcher H}|{Mix Interprete T}}
-         %Audio
 	    end
 	 end
       end
