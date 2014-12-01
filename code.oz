@@ -154,11 +154,12 @@ local Mix Interprete Projet CWD in
 	[] H|T then {Add T {AddVector P1 H {List.make {Max P1 H}}}}
       end
 
-      fun{AddVector V1 V2 Acc}
-	if V1\=nil andthen V2\=nil then {AddVector V1.2 V2.2 Acc|V1.1+V2.1}
-	elseif V1==nil then {Addvector nil V2.2 Acc|V2.1}
-	elseif V2==nil then {AddVector V1.2 nil Acc|V1.1}
-	else Acc
+      fun{AddVector V1 V2}
+         if V1\=nil andthen V2\=nil then V1.1+V2.1|{AddVector V1.2 V2.2}
+         elseif V1==nil andthen V2\=nil then V2.1|{AddVector nil V2.2}
+         elseif V2==nil andthen V1\=nil then V1.1|{AddVector V1.2 nil}
+         else nil
+         end
       end
 
       fun{MergeToVector X} % merge les vecteurs
