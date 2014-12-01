@@ -19,7 +19,7 @@ Pour le Jeudi 27 novembre :
 
 -Tâche 3 : Implémenter Interpreter(au moins le premier et le deuxième cas : pour une note et une suite de partition)
 
--Tâche 4 : Créer les fonctions supplémentaires nécessaire à l'implémentation (voir issues)
+-Tâche 4 : Créer les fonctions supplémentaires nécessaire à l'implémentation (see issues)
 
 Séance du Jeudi 27 novembre :
 
@@ -39,4 +39,18 @@ Pour le Dimanche 30 novembre :
 
 - Tâche 5 : Finir l'implémentation de Interprete(Done)
 
-- Tâche 7 : Comprendre la second partie : fonction Mix
+- Tâche 7 : Comprendre la second partie : fonction Mix(Done)
+
+Pour le Lundi 1 décembre :
+
+- Tâche 8 : Écrire les fonctions VoiceToVector et Merge
+
+Séance du 1 décembre :
+
+- Tâche 8 : Écrire les fonctions VoiceToVector et Merge(nearly finished)
+
+- Tâche 9 : Créer les filtres(To Do)
+ 
+Pour le Mardi 2 décembre :
+
+- Tâche 9 : Créer les filtres(To Do)
