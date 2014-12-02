@@ -192,17 +192,15 @@ local Mix Interprete Projet CWD in
       end
 
       fun{Renverser M}
-	case M of nil then nil
-	else
-	  local Aux in
-	    fun{Aux M Acc}
-	      case M of nil then Acc.2
-	      of H|T then
-		{Aux T Acc|H}
-	      end
+	local
+	  fun{Aux M Acc}
+	    case M of nil then Acc
+	    [] H|T then
+	      {Aux T H|Acc}
 	    end
-	  {Aux T nil}
 	  end
+	in
+	  {Aux M nil}
 	end
       end
 
@@ -216,7 +214,7 @@ local Mix Interprete Projet CWD in
 	end
       end
 
-      fun{Couper S1 S2 M} % fonctionne que pour l'intervalle dans le morceau
+      fun{Couper S1 S2 M} % fonctionne que pour l'intervalle DANS le morceau
 	local Aux Comp in
 	  fun{Aux S1 S2 M Comp}
 	    if M==nil then nil
