@@ -215,7 +215,8 @@ local Mix Interprete Projet CWD in
       end
 
       fun{Couper S1 S2 M} % fonctionne que pour l'intervalle DANS le morceau
-	local Aux Comp in
+	local
+	  Comp
 	  fun{Aux S1 S2 M Comp}
 	    if M==nil then nil
 	    elseif Comp<S1*44100.0 then {Aux S1 S2 M.2 Comp+1.0}
@@ -223,7 +224,8 @@ local Mix Interprete Projet CWD in
 	    elseif Comp>S2 then {Aux S1 S2 nil Comp}
 	    end
 	  end
-	{Aux S1 S2 M 1}
+	in
+	  {Aux S1 S2 M 1}
 	end
       end
    
@@ -248,11 +250,11 @@ local Mix Interprete Projet CWD in
 	local P={Flatten Partition} in
       	  case P of nil then nil
       	  []H|T then
-            case H of muet(X) then {Flatten {Muet {Interprete {Flatten X}}}|{Interprete T}}
-            []duree(secondes:X Y) then {Flatten {Duree X {Interprete {Flatten Y}}}|{Interprete T}}
-            []etirer(facteur:X Y) then {Flatten {Etirer X {Interprete {Flatten Y}}}|{Interprete T}}
-            []bourdon(note:X Y) then {Flatten {Bourdon {ToNote X} {Interprete {Flatten Y}}}|{Interprete T}}
-            []transpose(demitons:X Y) then {Flatten {Transpose X {Interprete {Flatten Y}}}|{Interprete T}}
+            case H of muet(X) then {Flatten {Muet {Interprete X}}|{Interprete T}}
+            []duree(secondes:X Y) then {Flatten {Duree X {Interprete Y}}|{Interprete T}}
+            []etirer(facteur:X Y) then {Flatten {Etirer X {Interprete Y}}|{Interprete T}}
+            []bourdon(note:X Y) then {Flatten {Bourdon {ToNote X} {Interprete Y}}|{Interprete T}}
+            []transpose(demitons:X Y) then {Flatten {Transpose X {Interprete Y}}|{Interprete T}}
             []A then {Flatten {NoteToEchantillon {ToNote A}}|{Interprete T}}
             end
 	  end
