@@ -249,7 +249,7 @@ local Mix Interprete Projet CWD in
       fun{Clip F1 F2 M}
 	case M of nil then nil
 	[] H|T then
-	  if H>F1 anthen H<F2 then H|{Clip F1 F2 T}
+	  if H>F1 andthen H<F2 then H|{Clip F1 F2 T}
 	  elseif H<F1 then F1|{Clip F1 F2 T}
 	  elseif H>F2 then F2|{Clip F1 F2 T}
 	  end
@@ -258,16 +258,15 @@ local Mix Interprete Projet CWD in
 
       fun{Couper S1 S2 M} % fonctionne que pour l'intervalle DANS le morceau
 	local
-	  Comp
 	  fun{Aux S1 S2 M Comp}
 	    if M==nil then nil
 	    elseif Comp<S1*44100.0 then {Aux S1 S2 M.2 Comp+1.0}
-	    elseif Comp>=S1*44100.0 andthen Comp<=S2*44100.0 then M.1|{Aux S1 S2 M.2 Comp+1.0}
+	    elseif Comp>=S1*44100.0 andthen Comp=<S2*44100.0 then M.1|{Aux S1 S2 M.2 Comp+1.0}
 	    elseif Comp>S2 then {Aux S1 S2 nil Comp}
 	    end
 	  end
 	in
-	  {Aux S1 S2 M 1}
+	  {Aux S1 S2 M 1.0}
 	end
       end
    
