@@ -225,7 +225,7 @@ local Mix Interprete Projet CWD in
 	    end
 	  end
 	in
-	  {Aux S1 S2 M 1}
+	  {Aux S1 S2 M 1.0}
 	end
       end
    
