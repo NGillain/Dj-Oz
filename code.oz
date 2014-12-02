@@ -148,9 +148,17 @@ local Mix Interprete Projet CWD in
 	end
       end
 
-      fun{Add P2 P1} % add a list of vector(P2) to one vector(P1) and return the sum
-	case P2 of nil then P1
-	[] H|T then {Add T {AddVector P1 H {List.make {Max P1 H}}}}
+      fun{MergeToVector P}
+      	local
+      	M={ListToVector P}
+      	fun{Somme X Acc}
+            case X of nil then Acc
+            []H|T then {Somme T {AddVector H Acc}}
+            end
+        end
+        in
+           {Somme M nil}
+        end
       end
 
       fun{AddVector V1 V2}
@@ -159,14 +167,6 @@ local Mix Interprete Projet CWD in
          elseif V2==nil andthen V1\=nil then V1.1|{AddVector V1.2 nil}
          else nil
          end
-      end
-
-      fun{MergeToVector X} % merge les vecteurs
-	local
-	  P={ListVector X}
-	  Sum
-	in
-	  Sum={Add P.2 P.1} % gere l'addition de listes de taille differente
       end
 
       fun{Ponderate N M} % pondere un vecteur audio avec N
