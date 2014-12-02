@@ -47,6 +47,7 @@ local Mix Interprete Projet CWD in
         end
       end
       	
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       
       fun {ToNote Note}
          case Note
@@ -111,6 +112,8 @@ local Mix Interprete Projet CWD in
             end
         end
       end
+      
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
       fun{ToVector Ech} % Transforme un echatillon en vecteur (ok)
 	local
@@ -179,17 +182,77 @@ local Mix Interprete Projet CWD in
       fun{Dispatcher X} % fonction qui choisit le filtre adapte
 	 case X
 	 of renverser(M) then {Renverser {Mix Interprete M}}
-	 [] repetition (nombre:N M) then
-	 [] repetition(duree:S M) then
+	 [] repetition (nombre:N M) then {RepetitionNb N {Mix Interprete M}
+	 [] repetition(duree:S M) then {RepetitionDu S {Mix Interprete M}
 	 [] clip(bas:F1 haut:F2 M) then {Clip F1 F2 {Mix Interprete M}}
-	 [] echo(delai:S M) then
-	 [] echo(delai:S decadence:F M) then
-	 [] echo(delai:S decadence:F repetition:N M) then
+	 [] echo(delai:S M) then {Mix Interprete [merge ([0.5#M 0.5#[voix([silence(duree: Delai)]) M]])]}
+	 [] echo(delai:S decadence:F M) then {Mix Interprete [merge ([(1.0/(1.0+F)#M a/(1.0+F)#[voix([silence(duree:S)]) M]])]}
+	 [] echo(delai:S decadence:F repetition:N M) then {Mix Interprete [merge ({Creation S F N}) M]}
 	 [] fondu(ouverture:S1 fermeture:S2 M) then {Fondu S1 S2 {Mix Interprete M}}
 	 [] fondu_enchaine(duree:S M1 M2) then {FonduEnchaine S {Mix Interprete M1} {Mix Interprete M2}}
 	 [] couper(debut:S1 fin:S2 M) then {Couper S1 S2 {Mix Interprete M}}
 	 end
       end
+      
+      fun{RepetitionNb Nbre Music}
+      	if(Nbre>0) then
+      	    {Flatten Music|{RepetitionNb Nbre-1 Music}}
+      	else
+      	    nil
+      	end
+      end
+      
+      fun{RepetitionDu Duree X} %X est deja sous forme vecteur audio
+        local
+            fun{Repet Y  Acc}	 
+               if(Acc=<Duree*44100.0) then
+                  case Y of nil then {Repet X Acc+1.0}
+                  []H|T then H|{Repet T Acc+1.0}
+                  end
+               else
+                  nil
+               end
+            end
+        in
+        {Repet X 0.0}
+        end	
+      end
+      
+      fun{ToVecteurMerge Delai Deca Repet M Comp}
+         if(Comp=<{IntToFloat Repet}) then
+             if(Comp==0.0) then
+                {Pow Deca Comp}#M |{ToVecteurMerge Delai Deca Repet M Comp+1.0}
+             else
+                {Pow Deca Comp}#[voix([silence(duree:Delai*Comp)]) M] |{ToVecteurMerge Delai Deca Repet M Comp+1.0}
+             end
+         else
+            nil
+         end
+       end
+       
+       fun{SumOfFact List Acc}
+       	  case List of nil then Acc
+       	  []H|T then
+       	      case H of A#B then {SumOfFact T Acc+A}
+       	      end
+       	  end
+       end
+       
+       fun{Creation Delai Deca Repetition Music}
+          local
+             X={ToVecteurMerge Delai Deca Repetition Music 0.0}
+             Y={SumOfFact X 0.0}
+             fun{ReAffect X Y}
+             	case X of nil then nil
+             	[] H|T then
+             	     case H of A#B then A/Y#B |{ReAffect T Y}
+             	     end
+             	end
+             end
+           in
+           {ReAffect X Y}
+           end
+        end
 
       fun{Fondu S1 S2 M}
 	local
