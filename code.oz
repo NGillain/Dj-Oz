@@ -185,10 +185,52 @@ local Mix Interprete Projet CWD in
 	 [] echo(delai:S M) then
 	 [] echo(delai:S decadence:F M) then
 	 [] echo(delai:S decadence:F repetition:N M) then
-	 [] fondu(ouverture:S1 fermeture:S2 M) then
-	 [] fondu_enchaine(duree:S M1 M2) then
+	 [] fondu(ouverture:S1 fermeture:S2 M) then {Fondu S1 S2 {Mix Interprete M}}
+	 [] fondu_enchaine(duree:S M1 M2) then {FonduEnchaine S {Mix Interprete M1} {Mix Interprete M2}}
 	 [] couper(debut:S1 fin:S2 M) then {Couper S1 S2 {Mix Interprete M}}
 	 end
+      end
+
+      fun{Fondu S1 S2 M}
+	local
+	  debut=S1*44100.0 % nombres de valeur dans le vecteur audio à modifier au debut
+	  fin=S2*44100.0 % nombres de valeur dans le vecteur audio à modifier a la fin
+	  Comp
+	  L={Length M}
+	  fun{Aux M Comp}
+	    case M of nil then nil
+	    []H|T then
+	      if Comp<=debut-1 then {Flatten H*(Comp/(debut-1.0))|{Aux T Comp+1}}
+	      elseif Comp>debut-1 andthen L-Comp>fin-1 then H|{Aux T Comp+1}
+	      else H*(L-Comp)/(fin-1)|{Aux T Comp+1}
+	      end
+	    end
+	  end
+	in 
+	{Aux M 0}
+	end
+      end
+
+      fun{FonduEnchaine S M1 M2}
+	local
+	  temp=S*44100.0
+	  L1={Length M1}
+	  L2={Length M2}
+	  Comp
+	  fun{Aux M1 M2 Comp}
+	    case M1 of nil then M2
+	    [] H1|T1 then
+	    if L1-Comp>temp-1.0 then {Flatten H1|{Aux T1 M2 Comp+1.0}}
+	    elseif L1-Comp<=temp-1.0 andthen Comp-L1+temp<=temp-1.0 then
+	      case M2 of H2|T2 then
+		H1*((L1-Comp)/(temp-1.0))+H2*((Comp-L1+temp)/(temp-1))|{Aux T1 T2 Comp+1.0}
+	      end
+	    else M2
+	    end
+	  end
+	in
+	{Aux M1 M2 0.0}
+	end
       end
 
       fun{Renverser M}
