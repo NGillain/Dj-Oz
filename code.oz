@@ -193,21 +193,21 @@ local Mix Interprete Projet CWD in
 
       fun{Fondu S1 S2 M}
 	local
-	  debut=S1*44100.0 % nombres de valeur dans le vecteur audio à modifier au debut
-	  fin=S2*44100.0 % nombres de valeur dans le vecteur audio à modifier a la fin
+	  Debut=S1*44100.0 % nombres de valeur dans le vecteur audio à modifier au debut
+	  Fin=S2*44100.0 % nombres de valeur dans le vecteur audio à modifier a la fin
 	  Comp
-	  L={Length M}
+	  L={IntToFloat {Length M}}
 	  fun{Aux M Comp}
 	    case M of nil then nil
 	    []H|T then
-	      if Comp<=debut-1 then {Flatten H*(Comp/(debut-1.0))|{Aux T Comp+1}}
-	      elseif Comp>debut-1 andthen L-Comp>fin-1 then H|{Aux T Comp+1}
-	      else H*(L-Comp)/(fin-1)|{Aux T Comp+1}
+	      if Comp<=Debut-1.0 then {Flatten H*(Comp/(Debut-1.0))|{Aux T Comp+1.0}}
+	      elseif Comp>Debut-1.0 andthen L-Comp-1.0>Fin-1.0 then H|{Aux T Comp+1.0}
+	      else H*(L-Comp-1.0)/(Fin-1.0)|{Aux T Comp+1.0}
 	      end
 	    end
 	  end
 	in 
-	{Aux M 0}
+	{Aux M 0.0}
 	end
       end
 
