@@ -276,17 +276,16 @@ local Mix Interprete Projet CWD in
 
       fun{FonduEnchaine S M1 M2}
 	local
-	  temp=S*44100.0
+	  Temp=S*44100.0
 	  L1={Length M1}
 	  L2={Length M2}
-	  Comp
 	  fun{Aux M1 M2 Comp}
 	    case M1 of nil then M2
 	    [] H1|T1 then
-	    if L1-Comp>temp-1.0 then {Flatten H1|{Aux T1 M2 Comp+1.0}}
-	    elseif L1-Comp<=temp-1.0 andthen Comp-L1+temp<=temp-1.0 then
+	    if (L1-Comp-1.0)>(Temp-1.0) then {Flatten H1|{Aux T1 M2 Comp+1.0}}
+	    elseif (L1-Comp-1.0)<=(Temp-1.0) andthen (Comp-L1+Temp)<=(Temp-1.0) then
 	      case M2 of H2|T2 then
-		H1*((L1-Comp)/(temp-1.0))+H2*((Comp-L1+temp)/(temp-1))|{Aux T1 T2 Comp+1.0}
+		H1*((L1-Comp-1.0)/(Temp-1.0))+H2*((Comp-L1+Temp)/(Temp-1))|{Aux T1 T2 Comp+1.0}
 	      end
 	    else M2
 	    end
