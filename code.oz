@@ -266,7 +266,7 @@ local Mix Interprete Projet CWD in
 	 local
 	    Debut=S1*44100.0
 	    Fin=S2*44100.0
-	    fun{Aux Debut Fin M Comp}
+	    fun{Aux Debut M Comp}
 	       if Debut<0.0 then 0.0|{Aux Debut+1.0 M Comp} % si on commence avant, il faut ajouter du silence
 	       elseif Comp<Debut then
 		 case M
