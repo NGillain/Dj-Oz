@@ -16,20 +16,30 @@
 \maketitle
 \tableofcontents
 
-% Ne pas oublier de pr�ciser le fait que l'on n'utilise seulement le mod�le d�claratif
+% Ne pas oublier de préciser le fait que l'on n'utilise seulement le modèle déclaratif
 
-\section{Structure du programme et d�cisions de conceptions}
+\section{Structure du programme et décisions de conceptions}
 
-Dans cette section, nous d�taillerons l'algorithme qui nous a amener � coder nos fonctions telles que nous les avons cod�es et nous nous arr�terons sur les points o� il a fallu choisir un algorithme plut�t qu'un autre.
+Dans cette section, nous détaillerons l'algorithme qui nous a amener à coder nos fonctions telles que nous les avons conçues
+et nous nous arrêterons sur les points où il a fallu choisir un algorithme plutôt qu'un autre.
 
 \subsection{La fonction Interprete}
 
+Après avoir étudier l'énoncé du projet, nous nous sommes lancés dans la conception de la fonction Interprète car nous avons vu
+que la fonction Mix nécessitait cette fonction. 
+Nous avons tout d'abord traiter l'argument que prennait Interprete : c'est une partition. Dès lors, nous nous sommes posés la 
+question comment transformer une liste d'atome en un résultat exploitable pour la fonction Mix. Nous avons alors décider 
+de mettre la partition dans une liste. Ensuite, nous avons utiliser le pattern matching pour traiter chaque élément de la 
+partition (note, transformation, suite de partitions). Dans le premier cas, nous avons transformer la note en une note étendue
+avec la méthode ToNote. Une fois effectué, on appelle la fonction NoteToEchantillon afin de transformer cette note étendue en
+un échantillon nous faisons alors un appel récursif pour parcourir toute la partition. Dans le cas où nous avons une 
+transformation,
 \subsection{Le fonction Mix}
 
-\section{Difficult�s et limitations du programme}
+\section{Difficultés et limitations du programme}
 
-\section{Complexit� des fonctions du programme}
+\section{Complexité des fonctions du programme}
 
-\section{Extension(s) apport�e(s)}
+\section{Extension(s) apportée(s)}
 
 \end{document}
