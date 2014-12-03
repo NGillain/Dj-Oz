@@ -54,3 +54,13 @@ Séance du 1 décembre :
 Pour le Mardi 2 décembre :
 
 - Tâche 9 : Créer les filtres(To Do)
+
+Séance du 2 décembre :
+
+- Tâche 9 : Créer les filtres(Done)
+
+- Tâche 10 : Finir le codage du Projet(Done)
+ 
+- Tâche 11 : Correction et debug du Projet(To Do)
+
+- Tâche 12 : Rédaction Rapport(To Do)
