@@ -1,8 +1,8 @@
-﻿% Vous ne pouvez pas utiliser le mot-clé 'declare'.
+% Vous ne pouvez pas utiliser le mot-clé 'declare'.
 local Mix Interprete Projet CWD in
    % CWD contient le chemin complet vers le dossier contenant le fichier 'code.oz'
    % modifiez sa valeur pour correspondre à votre système.
-   CWD = {Property.condGet 'testcwd' 'C:\\Users\\Nathan\\Documents\\Unif\\2014-2015\\Informatique\\Projet\\Projet2014\\'}
+   CWD = {Property.condGet 'testcwd' 'C:\\Users\\Edwin\\Documents\\ProjetOZ\\Projet2014\\Projet2014\\'}
 
    % Si vous utilisez Mozart 1.4, remplacez la ligne précédente par celle-ci :
    % [Projet] = {Link ['Projet2014_mozart1.4.ozf']}
@@ -18,9 +18,10 @@ local Mix Interprete Projet CWD in
    [Projet] = {Link [CWD#'Projet2014_mozart2.ozf']}
 
    local
-      %Audio = {Projet.readFile CWD#'wave/animaux/cow.wav'}
+      Audio = {Projet.readFile CWD#'wave/animaux/cow.wav'}
       
-      fun{Flatten L} % réduit les listes de listes de ... en liste simple
+      % Flatten réduit les listes de listes de ... en liste simple
+      fun{Flatten L}
 	 case L
 	 of nil then nil
 	 [] H|T then {Append {Flatten H} {Flatten T}}
@@ -28,7 +29,7 @@ local Mix Interprete Projet CWD in
 	 end
       end
       
-      fun{ComputeDemiTons Note} % calcule la hauteur d'une note par rapport a a4
+      fun{ComputeDemiTons Note}
 	 local Diff Alt
 	 in
 	    case Note.nom of a then Diff=0
@@ -47,7 +48,7 @@ local Mix Interprete Projet CWD in
       end
       	
       
-      fun {ToNote Note} % cree un record note a partir d'une note ecrite sous forme d'un atom
+      fun {ToNote Note}
 	 case Note
 	 of Nom#Octave then note(nom:Nom octave:Octave alteration :'#')
 	 [] Atom then
@@ -61,14 +62,14 @@ local Mix Interprete Projet CWD in
 	 end
       end
       
-      fun{NoteToEchantillon Note} % transforme une note en record echantillon
+      fun{NoteToEchantillon Note}
 	 case Note
 	 of silence then silence(duree:1.0)
 	 [] note(nom:X octave:Y alteration:Z) then echantillon(hauteur:{ComputeDemiTons Note} duree:1.0 instrument:none)
 	 end
       end
       
-      fun{Bourdon X Y} % transformation qui met a la meme hauteur toutes les notes
+      fun{Bourdon X Y}
 	 case Y of nil then nil
 	 []H|T then 
 	    case X of silence then silence(duree:H.duree)|{Bourdon X T}
@@ -77,11 +78,11 @@ local Mix Interprete Projet CWD in
 	 end
       end
       
-      fun{Muet X} % transforme toutes les notes de la partition en silence
+      fun{Muet X}
 	 {Bourdon silence X}
       end
       
-      fun{Etirer X Y} % allonge la duree d'un echantillon d'un facteur X
+      fun{Etirer X Y}
 	 case Y of nil then nil
 	 []H|T then
 	    case H of silence(duree:D) then silence(duree:D*X)|{Etirer X T}
@@ -90,19 +91,19 @@ local Mix Interprete Projet CWD in
 	 end
       end
       
-      fun{DureePart X Acc} % calcule la duree d'une partition
+      fun{DureePart X Acc}
 	 case X of nil then Acc
 	 []H|T then {DureePart T Acc+H.duree}
 	 end
       end
       
-      fun{Duree X Y} % etire toutes les notes de la partition pour qu'elle dure X secondes
+      fun{Duree X Y}
 	 case Y of nil then nil
 	 []H|T then {Etirer X/{DureePart Y 0.0} Y}
 	 end
       end
       
-      fun{Transpose X Y} % augmente chaque note de la partition de X demi-tons
+      fun{Transpose X Y}
 	 case Y of nil then nil
 	 []H|T then
 	    case H of silence(duree:D) then silence(duree:D)|{Transpose X T}
@@ -111,7 +112,7 @@ local Mix Interprete Projet CWD in
 	 end
       end
 
-       fun{ToVector Ech} % transforme un echantillon en vecteur audio
+       fun{ToVector Ech}
 	 local
 	    Vecteur
 	    Pi=3.14159
@@ -140,7 +141,7 @@ local Mix Interprete Projet CWD in
 	 end
       end
 
-      fun{AddVector V1 V2} % additionne deux vecteurs de taille différentes en ajoutant du silence si necessaire
+      fun{AddVector V1 V2}
 	 if V1\=nil andthen V2\=nil then V1.1+V2.1|{AddVector V1.2 V2.2}
 	 elseif V1==nil andthen V2\=nil then V2.1|{AddVector nil V2.2}
 	 elseif V2==nil andthen V1\=nil then V1.1|{AddVector V1.2 nil}
@@ -156,8 +157,8 @@ local Mix Interprete Projet CWD in
       end
 
       fun{ListVector X} % cree une liste contenant des listes representant les vecteurs audio a sommer
-	 case X
-	 of H|T then
+	 case X of nil then nil
+	 [] H|T then
 	    case H
 	    of N#M then {Ponderate N {Mix Interprete M}}|{ListVector T}
 	    end
@@ -165,7 +166,7 @@ local Mix Interprete Projet CWD in
       end
 
 
-      fun{MergeToVector P} % merge les vecteurs audio contenu dans P sous forme de liste d'atom 'Coeff#Music'
+      fun{MergeToVector P}
 	 local
 	    M={ListVector P}
 	    fun{Somme X Acc}
@@ -178,7 +179,7 @@ local Mix Interprete Projet CWD in
 	 end
       end
 
-      fun{RepetitionNb Nbre Music} %  repete une musique Nbre fois
+      fun{RepetitionNb Nbre Music}
 	 if(Nbre>=0) then
 	    {Flatten Music|{RepetitionNb Nbre-1 Music}}
 	 else
@@ -186,7 +187,7 @@ local Mix Interprete Projet CWD in
 	 end
       end
       
-      fun{RepetitionDu Duree X} % repete une musique pendant X secondes
+      fun{RepetitionDu Duree X} %X est deja sous forme vecteur audio
 	 local
 	    fun{Repet Y  Acc}	 
 	       if(Acc=<Duree*44100.0) then
@@ -202,19 +203,19 @@ local Mix Interprete Projet CWD in
 	 end	
       end
 
-      fun{ToVecteurMerge Delai Deca Repet M Comp} % transforme un vecteur audio en une liste de vecteur audio utilisable par Merge
+      fun{ToVecteurMerge Delai Deca Repet M Comp}
 	 if(Comp=<{IntToFloat Repet}) then
 	    if(Comp==0.0) then
 	       {Pow Deca Comp}#M |{ToVecteurMerge Delai Deca Repet M Comp+1.0}
 	    else
-	       {Pow Deca Comp}#[voix([silence(duree:Delai*Comp)]) M] |{ToVecteurMerge Delai Deca Repet M Comp+1.0}
+	       {Pow Deca Comp}#{Flatten [voix([silence(duree:Delai*Comp)]) M]} |{ToVecteurMerge Delai Deca Repet M Comp+1.0}
 	    end
 	 else
 	    nil
 	 end
       end
        
-      fun{SumOfFact List Acc} % Somme des coefficients pour merge
+      fun{SumOfFact List Acc}
 	 case List of nil then Acc
 	 []H|T then
 	    case H of A#B then {SumOfFact T Acc+A}
@@ -222,7 +223,7 @@ local Mix Interprete Projet CWD in
 	 end
       end
        
-      fun{Creation Delai Deca Repetition Music} % pondere les vecteurs audio afin de pouvoir les merger
+      fun{Creation Delai Deca Repetition Music}
 	 local
 	    X={ToVecteurMerge Delai Deca Repetition Music 0.0}
 	    Y={SumOfFact X 0.0}
@@ -239,7 +240,7 @@ local Mix Interprete Projet CWD in
       end
 
 
-      fun{Renverser M} % renverse le vecteur audio et permet de creer ainsi un message subliminal ^^
+      fun{Renverser M}
 	 local
 	    fun{Aux M Acc}
 	       case M of nil then Acc
@@ -252,7 +253,7 @@ local Mix Interprete Projet CWD in
 	 end
       end
 
-      fun{Clip F1 F2 M} % assigne une intensite maximale et minimale tel que les valeurs du vecteur audio sont comprises entre F1 et F2
+      fun{Clip F1 F2 M}
 	 case M of nil then nil
 	 [] H|T then
 	    if H>F1 andthen H<F2 then H|{Clip F1 F2 T}
@@ -262,23 +263,23 @@ local Mix Interprete Projet CWD in
 	 end
       end
 
-      fun{Couper S1 S2 M} % coupe le morceau aux temps indiqués. Si les temps sont en dehors de la bande sonore, on ajoute du silence
+      fun{Couper S1 S2 M}
 	 local
 	    Debut=S1*44100.0
 	    Fin=S2*44100.0
 	    fun{Aux Debut M Comp}
-	       if Debut<0.0 then 0.0|{Aux Debut+1.0 M Comp} % si on commence avant, il faut ajouter du silence
+	       if Debut<0.0 then 0.0|{Aux Debut+1.0 M Comp}
 	       elseif Comp<Debut then
 		 case M
-		   of H|T then {Aux Debut T Comp+1.0} % on continue jusqu'à trouver le début du morceau à couper
-		   [] nil then nil % le morceau est vide
+		   of H|T then {Aux Debut T Comp+1.0} 
+		   [] nil then nil 
 		 end
 	       elseif Comp>=Debut andthen Comp=<Fin then
 		  case M
-		    of H|T then H|{Aux Debut T Comp+1.0} % on coupe la valeur et on la garde
-		    [] nil then 0.0|{Aux Debut nil Comp+1.0} % on doit continuer avec du silence même si le morceau est fini
+		    of H|T then H|{Aux Debut T Comp+1.0} 
+		    [] nil then 0.0|{Aux Debut nil Comp+1.0}
 		  end
-	       elseif Comp>Fin then nil % fin du découpage
+	       elseif Comp>Fin then nil 
 	       end
 	    end
 	 in
@@ -286,7 +287,7 @@ local Mix Interprete Projet CWD in
 	 end
       end
 
-      fun{Fondu S1 S2 M} % applique un fondu qui augmente l'intensite progressivement au debut et diminue l'intensite a la fin
+      fun{Fondu S1 S2 M}
 	 local
 	    Debut=S1*44100.0
 	    Fin=S2*44100.0 
@@ -305,7 +306,7 @@ local Mix Interprete Projet CWD in
 	 end
       end
 
-      fun{FonduEnchaine S M1 M2} % applique un fondu sur la fin du premier morceau et joue simultanement le deuxieme morceau adoucit par un fondu sur le debut de celui-ci
+      fun{FonduEnchaine S M1 M2}
 	 local
 	    Temp=S*44100.0
 	    L1={IntToFloat {Length M1}}
@@ -313,7 +314,7 @@ local Mix Interprete Projet CWD in
 	    fun{Aux M1 M2 Comp}
 	       case M1 of nil then M2
 	       [] H1|T1 then
-		  if (L1-Comp-1.0)>(Temp-1.0) then {Flatten H1|{Aux T1 M2 Comp+1.0}}
+		  if (L1-Comp-1.0)>(Temp-1.0) then H1|{Aux T1 M2 Comp+1.0}
 		  elseif (L1-Comp-1.0)=<(Temp-1.0) andthen (Comp-L1+Temp)=<(Temp-1.0) then
 		     case M2 of H2|T2 then
 			H1*((L1-Comp-1.0)/(Temp-1.0))+H2*((Comp-L1+Temp)/(Temp-1.0))|{Aux T1 T2 Comp+1.0}
@@ -323,22 +324,25 @@ local Mix Interprete Projet CWD in
 	       end
 	    end
 	 in
-	    {Aux M1 M2 0.0}
+	    {Flatten {Aux M1 M2 0.0}}
 	 end
       end
 
 
-      fun{Dispatcher X} % Dispatch qui renvoie chaque filtre a la fonctino qui lui correspond
+
+
+
+      fun{Dispatcher X} 
 	 case X
 	 of renverser(M) then {Renverser {Mix Interprete M}}
 	 [] repetition(nombre:N M) then {RepetitionNb N {Mix Interprete M}}
 	 [] repetition(duree:S M) then {RepetitionDu S {Mix Interprete M}}
 	 [] clip(bas:F1 haut:F2 M) then {Clip F1 F2 {Mix Interprete M}}
-	 [] echo(delai:S M) then {Mix Interprete [merge ([0.5#M 0.5#[voix([silence(duree: S)]) M]])]}
-	 [] echo(delai:S decadence:F M) then {Mix Interprete [merge ([(1.0/(1.0+F))#M F/(1.0+F)#[voix([silence(duree:S)]) M]])]}
-	 [] echo(delai:S decadence:F repetition:N M) then {Mix Interprete [merge ({Creation S F N M}) M]}
+	 [] echo(delai:S M) then {Mix Interprete [merge([0.5#M 0.5#{Flatten [voix([silence(duree: S)]) M]}])]}
+	 [] echo(delai:S decadence:F M) then {Mix Interprete [merge([(1.0/(1.0+F))#M (F/(1.0+F))#{Flatten [voix([silence(duree:S)]) M]}])]}
+	 [] echo(delai:S decadence:F repetition:N M) then {Mix Interprete [merge({Creation S F N M})]}
 	 [] fondu(ouverture:S1 fermeture:S2 M) then {Fondu S1 S2 {Mix Interprete M}}
-	 [] fondu_enchaine(duree:S M1 M2) then {Flatten {Fondu 0.0 S {Mix Interprete M1}}|{Fondu S 0.0 {Mix Interprete M2}}}
+         [] fondu_enchaine(duree:S M1 M2) then {FonduEnchaine S {Mix Interprete M1} {Mix Interprete M2}}
 	 [] couper(debut:S1 fin:S2 M) then {Couper S1 S2 {Mix Interprete M}}
 	 end
       end
@@ -347,7 +351,7 @@ local Mix Interprete Projet CWD in
    
    in
       % Mix prends une musique et doit retourner un vecteur audio.
-      fun {Mix Interprete Music} % permet de mixer de la musique
+      fun {Mix Interprete Music}
 	 case Music
 	 of nil then nil
 	 []H|T then
@@ -362,7 +366,7 @@ local Mix Interprete Projet CWD in
       end
 
       % Interprete doit interpréter une partition
-      fun {Interprete Partition} % permet de creer des partitions simples utilisables dans Mix
+      fun {Interprete Partition}
 	 local P={Flatten Partition} in
 	    case P of nil then nil
 	    []H|T then
@@ -386,7 +390,7 @@ local Mix Interprete Projet CWD in
       %
       % Si votre code devait ne pas passer nos tests, cet exemple serait le
       % seul qui ateste de la validité de votre implémentation.
-	 {Browse {Projet.run Mix Interprete Music CWD#'out.wav'}}
+	 {Browse {Projet.run Mix Interprete Music CWD#'angeson.wav'}}
       end
    end
 end
