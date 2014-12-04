@@ -20,8 +20,12 @@
 
 \section{Structure du programme et décisions de conceptions}
 
-Dans cette section, nous détaillerons l'algorithme qui nous a amener à coder nos fonctions telles que nous les avons conçues
-et nous nous arrêterons sur les points où il a fallu choisir un algorithme plutôt qu'un autre.
+Dans cette section, nous détaillerons l'algorithme qui nous a amener à coder nos fonctions telles que nous les avons codées et
+nous nous arrêterons sur les points où il a fallu choisir un algorithme plutôt qu'un autre. Point important que nous tenons 
+souligner : nous n'avons utilisé que des structures du paradigme de programmation déclaratif. Nous n'avons pas juger utile
+d'utiliser d'autres structures car la puissance de ce paradigme est assez impresionnante (malgré quelques petites limitations).
+Nous avons donc utiliser beaucoup de pattern matching et de récursion sur des fonctions que nous avons ensuite cachées grâce
+à la programmation d'ordre supérieur dans d'autres fonctions pou rendre le tout propre. Bref, voici la structure de notre programme.
 
 \subsection{La fonction Interprete}
 
@@ -43,9 +47,57 @@ Enfin, pour traiter le cas de suite de partitions, nous utilisons la méthode de
 
 \subsection{Le fonction Mix}
 
+Après avoir transformé une liste d'atomes représentant les notes d'une partition standard en liste de record que l'on peut
+mieux exploiter, la deuxième fonction, à savoir {Mix Interprete Music}, va utiliser cette liste de record et l'échantillonner
+à $44100$ valeurs sur un sinus afin d'obtenir un vecteur audio que l'ordinateur peut utiliser grâce au code annexe.
+
+Pour commencer, la fonction Mix fait du pattern matching afin de déterminer quel type d'argument Mix doit traiter.
+Si c'est une voix, Il utilise VoiceToVector qui transforme une liste d'echantillon en vecteur audio. Cette fonction
+utilise une autre fonction appelée ToVector qui transforme un seul echantillon en vecteur audio. En utilisant la récursion,
+nous pouvons écrire VoiceToVector de manière simple et efficace. Si l'argument de Mix est une partition, nous devons d'abord
+l'interpreter avec la fonction Interprete puis lui appliquer VoiceToVector étant donné que la partition interpretée est une voix.
+Si c'est un fichier au format .WAV, une fonction est fournie par le professeur pour lire le fichier. Elle s'appelle
+Projet.readFile. Ensuite, si l'argument est un record suivant la pattern "merge(VecteurAudio)", alors on applique la fonction
+MergeToVector. Cette fonction utilise deux sous-fonction, ListVector et AddVector, et une fonction interne Somme. Somme est simple :
+il utilise AddVector par récursion afin d'additionner des vecteurs même s'il sont de tailles différentes
+(en rajoutant du silence si nécessaire). ListVector, quand à elle, crée à partir d'une liste d'atomes
+avec la pattern "coefficient#musique" une liste de vecteurs audio pondéré par les coefficient de la liste entrée en argument.
+Donc, MergeToVector utilise d'abord ListVector pour avoir une liste de vecteurs audio à superposer et Somme,
+qui utilise AddVector, retourne un vecteur audio contenant les musiques pondérées.
+
+Enfin, Si l'argument ne correspond à aucun des pattern ci-dessus, c'est que celui-ci est un filtre. Nous avons décidé de créer
+un dispatcher(appelé Dispatcher *très original*) qui, grâce au pattern matching va déterminer de quel filtre il s'agit et va donc
+traiter le morceau avec la fonction appropriée. Ici, nous avons six filtres dont certains on plusieurs signatures différentes :
+renverser, repetition, clip, echo, fondu et couper. Renverser retourne le vecteur audio à l'envers, ce qui permet de créer des messages
+subliminaux géniaux. Pour cela, nous utilisons un accumulateur et ajoutons le premier élément obtenu grâce au pattern matching
+dans l'accumulateur en tête de la liste. Pour Repetition, nous utilisons la récursion pour rejouer le même vecteur audio plusieurs fois
+ou jusqu'à un certain temps. Le filtre clip, quant à lui, plafonne les valeurs minimales et maximales du vecteur audio (par récursion),
+c'est-à-dire que si la valeur est en supérieure/inférieur aux limites, alors on prend la valeur maximale/minimale et on la met
+dans le vecteur audio sinon on laisse la valeur actuelle.  Ensuite, Echo produit un echo dans la musique avec un delai ou delai et
+une decadence voire un delai, une decadence et une repretition. Pour cette fonction, nous avons décider dans un premier temps de retourner
+une liste d'atomes au pattern "coefficient#musique" que nous utiliserons en argument dans merge par la suite pour obtenir un seul vecteur audio.
+En ce qui concerne fondu, cette fonction adoucit la musique au début et à la fin. Pour cela, il suffit de multiplier les valeurs du début et
+de la fin par un facteur qui réduit correctement l'intensité du vecteur audio pour faire un fondu. Fondu_Enchaine applique un fondu sur la fin
+d'un morceau et sur le début d'un autre morceau et concatene les deux vecteurs sur leur fondu. Le principe est le même que pour le fondu :
+on multiplie les valeurs par un coefficient afin de diminuer l'intensité et obtenir un vecteur adoucit. Enfin, le filtre Couper prend une partie
+du morceau en fonction de $S1$ et $S2$. Si $S1$ et $S2$ sont hors du morceau, alors on rajoute du silence. Voila qui clôt l'algorithme de Mix.
+
 \section{Difficultés et limitations du programme}
 
 Dans cette section, nous allons détailler les difficultés rencontrées lors de la conception du programme
+
+Nous avons éprouvé des difficultés pour comprendre les objectifs de Interprete et Mix au début. La synthaxe était fort lourde ce qui fait que
+l'on se perdait souvent par soucis de compréhension des notations. De plus, l'implémentation des filtres a été un peu ardue. En effet,
+nous avons testé notre code fonction par fonction et comparé le résultat obtenu avec le résultat attendu. Souvent, notre algorithme de base était correct
+mais l'implémentation l'était un peu moins, ce qui fait que nous n'arrivions pas toujours au bon résultat. Dans la plupart des cas où les résulatts différaient,
+nous comprenions ce qui ne fonctionnait pas, par exemple, un indice "OutOfBound" ou erreur "Float attendu". Ce qui fait que nous corrigions notre implémentation
+au fur et à mesure pour chaque cas traité dans la fonction et que, finalement, nous arrivions au résultat final présenté plus haut. Le reste du programme
+n'a pas posé de problème majeurs : Interprete était somme toute assez simple (malgré qu'il fallait comprendre la synthaxe) et Mix était similaire dans le sens
+où il fallait, pour les deux fonctions, appliqué du pattern matching pour connaître le type d'arguments introduits dans la fonction.
+
+Nous avons essayé d'optimiser le coût en mémoire et en opérations en rendant nos fonction récursives terminales. Cela n'a pas toujours été possible,
+notamment pour une fonction, où nos devions Flatten une liste décomposée esleon le pattern H|T et chaque H et T devaient être calculé par récursion,
+ce qui augmente la taille de la pile sémantique. Cependant, l'opération Flatten est obligatoire afin d'obtenir une liste sans liste a l'intérieur.
 
 \section{Complexité des fonctions du programme}
 
