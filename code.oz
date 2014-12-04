@@ -136,7 +136,7 @@ local Mix Interprete Projet CWD in
       fun{VoiceToVector L} % transforme une liste d'echantillon en vecteur audio
 	 case L of nil then nil
 	 [] H|T then
-	    {Flatten {ToVector H}|{VoiceToVector T}}
+	    {Flatten  {ToVector H}|{VoiceToVector T}}
 	 end
       end
 
@@ -392,7 +392,7 @@ local Mix Interprete Projet CWD in
       end
 
       local 
-	 Music = {Projet.load CWD#'joie.dj.oz'}
+	 Music = {Projet.load CWD#'example.dj.oz'}
       in
       % Votre code DOIT appeler Projet.run UNE SEULE fois.  Lors de cet appel,
       % vous devez mixer une musique qui démontre les fonctionalités de votre
@@ -400,7 +400,7 @@ local Mix Interprete Projet CWD in
       %
       % Si votre code devait ne pas passer nos tests, cet exemple serait le
       % seul qui ateste de la validité de votre implémentation.
-	 {Browse {Projet.run Mix Interprete Music CWD#'angeson.wav'}}
+	 {Browse {Projet.run Mix Interprete Music CWD#'out.wav'}}
       end
    end
 end
