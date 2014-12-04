@@ -26,19 +26,19 @@ et nous nous arrêterons sur les points où il a fallu choisir un algorithme plu
 \subsection{La fonction Interprete}
 
 Après avoir étudier l'énoncé du projet, nous nous sommes lancés dans la conception de la fonction Interprète car nous avons vu
-que la fonction Mix nécessitait cette fonction. 
+que la fonction Mix nécessitait cette fonction. Nous avons donc jugé qu'il était préférable de commencer par cette fonction.
 Nous avons tout d'abord traiter l'argument que prennait Interprete : c'est une partition. Dès lors, nous nous sommes posés la 
 question comment transformer une liste d'atome en un résultat exploitable pour la fonction Mix. Nous avons alors décider 
-de mettre la partition dans une liste. Ensuite, nous avons utiliser le pattern matching pour traiter chaque élément de la 
+de mettre la partition dans une liste d'échantillons. Un échantillon étant un enregistrement qui prend comme champ la hauteur
+de la note, sa durée et son instrument. Ensuite, nous avons utilisé du pattern matching pour traiter chaque élément de la 
 partition (note, transformation, suite de partitions). 
 Dans le premier cas, nous avons transformer la note en une note étendue avec la méthode ToNote. Une fois effectué, on appelle 
-la fonction NoteToEchantillon afin de transformer cette note étendue en un échantillon nous faisons alors un appel récursif 
-pour parcourir toute la partition. Dans le cas où nous avons une transformation, on utilise un pattern matching pour voir de 
-quelle transformation il s'agit. Nous appelons ensuite la fonction qui lui correspond. 
-Au niveau des différentes transformations, nous avons un algorithme semblable pour chaque fonction. En effet, chaque fonction 
-prend deux arguments. Le premier correspond à une liste d'échantillon tandis que le deuxième correspond au changement à devoir
-effectuer. Il y a juste pour la fonction Duree, nous appelons une autre fonction DureePart qui calcule la durée totale de la 
-partition avec l'aide d'un accumulateur.
+la fonction NoteToEchantillon (fonction qui prend en argument une note étendue et qui renvoit un échantillon).
+Dans le cas où nous avons une transformation, on utilise du pattern matching pour voir de quelle transformation il s'agit. 
+Nous appelons ensuite la fonction qui lui correspond. Au niveau des différentes transformations, nous avons un algorithme 
+semblable pour chaque fonction. En effet, chaque fonction prend deux arguments. Le premier correspond à une liste 
+d'échantillons tandis que le deuxième correspond au changement à devoir effectuer. Mis à part pour la fonction Duree où nous 
+appelons une autre fonction DureePart qui calcule la durée totale de la partition avec l'aide d'un accumulateur.
 Enfin, pour traiter le cas de suite de partitions, nous utilisons la méthode de récursion terminale.
 
 \subsection{Le fonction Mix}
