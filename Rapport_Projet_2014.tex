@@ -10,13 +10,12 @@
 
 \title{Rapport Projet FSA1402 : Dj-Oz}
 \pagestyle{plain}
-\author{Gillain Nathan : NOMA 78791200 \and Hoo Sing Leung : NOMA }
+\author{Gillain Nathan : NOMA 78791200 \and Hoo Sing Leung : NOMA 50761200}
 
 \begin{document}
 \maketitle
 \tableofcontents
 
-% Ne pas oublier de préciser le fait que l'on n'utilise seulement le modèle déclaratif
 
 \section{Structure du programme et décisions de conceptions}
 
@@ -101,6 +100,78 @@ ce qui augmente la taille de la pile sémantique. Cependant, l'opération Flatte
 
 \section{Complexité des fonctions du programme}
 
+Voici un tableau reprenant les complexités temporelles et spatiales de nos principales fonctions. Nous tenons à préciser que les complexités spatiales
+sont estimées et donc pas forcément exactes. Cependant, nous savons que la complexité temporelle borne la complexité spatiale. En effet, un ordinateur ne peut pas
+calculer N terme en temps décrit par une constante.
+
+\begin{tabular}{|c|c|c|}
+\hline
+Fonction & Complexité Temporelle & Complexité spatiale(Maximale)
+\hline
+fun{Flatten L} & N^{2} & idem
+\hline
+fun{ToNote Note} & 1 & idem
+\hline
+fun{Bourdon X Y}=fun{Muet X} & N & idem
+\hline
+fun{NoteToEchantillon Note} & 1 & idem
+\hline
+fun{ComputeDemiTons Note} & 1 & idem
+\hline
+fun{Etirer X Y} & N & idem
+\hline
+fun{Duree X Y} & N & idem
+\hline
+fun{DureePart X Acc} & N & idem
+\hline
+fun{Transpose X Y} & N & idem
+\hline
+fun{Interprete Partition} & N^{3} & idem
+\hline
+fun{ToVector Ech} & N & idem
+\hline
+fun{VoiceToVector Ech} & N^{3} & idem
+\hline
+fun{AddVector V1 V2} & N & idem
+\hline
+fun{Ponderate N M} & N & idem
+\hline
+fun{ListVector X} & N & idem
+\hline
+fun{MergeToVector P} & N & idem
+\hline
+fun{RepetitionNb Nbre Music} & iN^{2} & idem
+\hline
+fun{RepetitionDu Duree X} & N & idem
+\hline
+fun{ToVecteurMerge Delai Deca Repet M Comp} & N^{2} & idem
+\hline
+fun{Renverser M} & N & idem
+\hline
+fun{Clip F1 F2 M} & N & idem
+\hline
+fun{Couper S1 S2 M} & N & idem
+\hline
+fun{Fondu S1 S2 M} & N & idem
+\hline
+fun{FonduEnchaine S M1 M2} & N & idem
+\hline
+fun{Dispatcher X} & 1 & idem
+\hline 
+fun{Mix Interprete Music} & N^{2} & idem
+\hline
+\end{tabular}
+
 \section{Extension(s) apportée(s)}
+
+Nous avons essaié de faire un fondu sur toutes les notes dans Mix afin d'obtenir un lissage mais cela ne semble pas marché.
+Le lissage est sans doute un peu plus complexe qu'un simple fondu sur chaque note.
+
+\section{Conclusion}
+
+Ce projet nous aura permis de mieux comprendre et approfondir le paradigme déclaratif. Ce ne fut pas de tout repos(voire section limitation et problèmes)
+mais nous y sommes parvenu et sommes satisfait du résultat final. Avec plus de temps, nous aurions peut-être imlpémenté les instruments ou d'autres filtre
+(comme une distortion de fréquence créant un effet assez amusant). Nous aurions pu également mieux optimisé notre programme en essayant de bien compartimenté
+et en rendant toutes les fonction terminales récursives(seules quelques unes ne le sont pas).
 
 \end{document}
